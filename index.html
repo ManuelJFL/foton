@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0b0d24">
+<title>Para Foton</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23f5c518' d='M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z'/%3E%3Crect x='8' y='18' width='8' height='2' rx='1' fill='%232b2a8c'/%3E%3Crect x='9' y='21' width='6' height='2' rx='1' fill='%232b2a8c'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="locked">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="bulb" viewBox="0 0 48 64">
+    <path d="M24 3C13.5 3 5 11.3 5 21.6c0 6.6 3.4 11.4 7 15 2.3 2.4 3.6 5 3.6 8.2V47h16.8v-2.2c0-3.2 1.3-5.8 3.6-8.2 3.6-3.6 7-8.4 7-15C43 11.3 34.5 3 24 3z" fill="currentColor"/>
+    <rect x="15.5" y="49" width="17" height="4" rx="2" fill="var(--ink)"/>
+    <rect x="16.5" y="55" width="15" height="4" rx="2" fill="var(--ink)"/>
+    <rect x="20" y="60" width="8" height="3" rx="1.5" fill="var(--ink)"/>
+    <path d="M19 41V32c0-3 2.2-5 5-5s5 2 5 5v9" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round" opacity=".55"/>
+  </symbol>
+</svg>
+
+<header class="cover" id="portada">
+  <div class="cover-swap">
+    <h1 class="cover-q" id="pregunta">¿Me ayudas a encender la bombilla?</h1>
+    <p class="cover-thanks" aria-hidden="true" id="gracias">Gracias. Así se ve mejor.</p>
+  </div>
+  <button class="lamp" id="lamp" type="button" aria-pressed="false" aria-label="Encender la bombilla">
+    <span class="lamp-glow" aria-hidden="true"></span>
+    <svg class="lamp-svg" viewBox="0 0 120 170" aria-hidden="true">
+      <path class="lamp-glass" d="M60 6C31.7 6 9 28.2 9 55.8c0 17.5 9 30.4 18.6 40 6.2 6.3 9.6 13.4 9.6 21.9V124h45.6v-6.3c0-8.5 3.4-15.6 9.6-21.9 9.6-9.6 18.6-22.5 18.6-40C111 28.2 88.3 6 60 6z"/>
+      <path class="lamp-shine" d="M30 46c2.5-10 10-18 20-21"/>
+      <path class="lamp-wire" d="M48 122V92M72 122V92M48 92l-6-14c-1.5-3.5 3-6 5.4-3l4.6 6 4-8c1.7-3.3 6.3-3.3 8 0l4 8 4.6-6c2.4-3 6.9-.5 5.4 3l-6 14"/>
+      <rect class="lamp-base" x="37" y="128" width="46" height="10" rx="5"/>
+      <rect class="lamp-base" x="39" y="142" width="42" height="10" rx="5"/>
+      <path class="lamp-base" d="M47 156h26l-4 9c-1 2-3 3-5 3h-8c-2 0-4-1-5-3z"/>
+    </svg>
+  </button>
+  <div class="cover-swap">
+    <p class="cover-tap" id="pulsa">Pulsa para encenderla</p>
+    <a class="cover-down" href="#videos" id="bajar" tabindex="-1">
+      <span>Bajar</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15M5 12l7 7 7-7"/></svg>
+    </a>
+  </div>
+</header>
+
+<main id="contenido">
+
+  <section class="block" id="videos">
+    <p class="eyebrow">Para empezar</p>
+    <h2 class="section-title">Fuera de lo corriente</h2>
+
+    <figure class="video">
+      <div class="video-frame">
+        <video controls loop playsinline preload="metadata" src="video1.mp4"></video>
+        <div class="video-empty"><svg class="bulb-icon"><use href="#bulb"/></svg><span>video1.mp4</span></div>
+      </div>
+      <figcaption>
+        <span class="video-num">Vídeo</span>
+        <p>Una conversación conmigo mismo sobre lo que cuesta llegar a fin de mes.</p>
+      </figcaption>
+    </figure>
+    <div class="video-bridge">
+      <p>Antes de revisar esta factura, hay que encontrar al responsable.</p>
+      <a class="btn btn-search" href="#juego">Buscar en la habitación ↓</a>
+    </div>
+  </section>
+
+  <section class="block" id="juego">
+    <p class="eyebrow">Minijuego</p>
+    <h2 class="section-title">¿Cuál de estos elementos es responsable de una factura fuera de lo corriente?</h2>
+    <p class="room-help">Elige un elemento de la habitación. Tienes 3 intentos para encontrar al responsable.</p>
+    <div class="room-top">
+      <p class="room-tries" id="room-tries" aria-live="polite">Intentos restantes: <strong>3</strong></p>
+    </div>
+    <div class="room" id="room">
+      <svg viewBox="0 0 332 292" aria-hidden="true" focusable="false"></svg>
+      <button class="room-hit" type="button" data-obj="puerta" aria-label="Puerta" data-text="Soy la salida. Me abriré cuando encuentres al responsable."></button>
+      <button class="room-hit" type="button" data-obj="techo" aria-label="Lámpara de techo" data-text="Yo solo ilumino. Esta factura no la he escrito yo."></button>
+      <button class="room-hit" type="button" data-obj="ventilador" aria-label="Ventilador" data-text="Yo solo doy vueltas. Esta factura no es cosa mía."></button>
+      <button class="room-hit" type="button" data-obj="plancha" aria-label="Plancha" data-text="Yo quito arrugas, no hago facturas."></button>
+      <button class="room-hit" type="button" data-obj="pie" aria-label="Lámpara de pie" data-text="Yo doy luz a este rincón. De facturas, nada."></button>
+      <button class="room-hit" type="button" data-obj="guitarra" aria-label="Guitarra eléctrica y amplificador" data-text="Yo pongo la música, no las facturas."></button>
+      <button class="room-hit" type="button" data-obj="portatil" aria-label="Portátil enchufado" data-text="Me usan para escribir, pero esta factura tiene otro autor."></button>
+      <button class="room-hit" type="button" data-obj="regleta" aria-label="Regleta" data-text="Yo reparto la corriente, no las culpas."></button>
+      <button class="room-hit" type="button" data-obj="cargador" aria-label="Cargador enchufado" data-text="Yo cargo baterías, no responsabilidades."></button>
+      <button class="room-hit" type="button" data-obj="consola" aria-label="Consola" data-text="Yo estoy aquí para jugar, no para facturar."></button>
+      <button class="room-hit room-me" type="button" data-obj="yo" aria-label="Manuel, con una caja y una bombilla" data-text="¿Yo?" data-hint="Se acabaron los intentos. El responsable era…" data-self="¡Soy yo!"></button>
+      <p class="room-bubble" id="room-bubble" role="status" aria-live="polite"></p>
+      <p class="room-hint" id="room-hint" role="status" aria-live="polite"></p>
+    </div>
+    <div class="room-end" id="room-end" hidden>
+      <p class="room-reveal" id="room-reveal" role="status" hidden>Era yo. Esta factura no se mide en kWh, sino en ganas de empezar.</p>
+      <blockquote class="room-quote">
+        <p>La bombilla va en la caja.<br>La energía la pongo yo.</p>
+        <footer class="room-sign"><s>Thomas Edison</s> — Manuel Felipe</footer>
+      </blockquote>
+    </div>
+    <div class="room-actions">
+      <button class="btn btn-restart" id="room-restart" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/></svg>Volver a jugar</button>
+    </div>
+  </section>
+
+  <section class="block finale" id="cierre">
+    <h2 class="finale-title" id="finale-title" hidden>Nos vemos en la entrevista. <span aria-hidden="true">💡</span></h2>
+    <p class="finale-sign">— Manuel Felipe</p>
+    <a class="btn btn-talk" id="hablamos" href="https://wa.me/34675573073?text=%C2%A1Est%C3%A1s%20contratado!%20Empiezas%20la%20semana%20que%20viene." target="_blank" rel="noopener">¿Hablamos?</a>
+  </section>
+
+  <section class="block" id="referencias">
+    <p class="eyebrow">Glosario de la hoja</p>
+    <h2 class="section-title">Referencias de marketing</h2>
+    <div class="refs">
+      <details class="ref" open>
+        <summary><span class="ref-tag">4P</span>Las 4 P</summary>
+        <div class="ref-body">
+          <p><b>Qué es:</b> producto, precio, plaza y promoción, las cuatro piezas básicas de cualquier oferta.</p>
+          <p><b>Cómo lo uso contigo:</b> el producto soy yo; el precio, una entrevista; la plaza, vuestra oficina; la promoción, este paquete y esta página.</p>
+        </div>
+      </details>
+      <details class="ref">
+        <summary><span class="ref-tag">CTA</span>Llamada a la acción</summary>
+        <div class="ref-body">
+          <p><b>Qué es:</b> el paso concreto que se le pide a quien recibe el mensaje.</p>
+          <p><b>Cómo lo uso contigo:</b> el QR de la hoja y el botón del final. Solo os pido un gesto: escribirme.</p>
+        </div>
+      </details>
+      <details class="ref">
+        <summary><span class="ref-tag">KPI</span>Indicador clave</summary>
+        <div class="ref-body">
+          <p><b>Qué es:</b> la cifra que dice si algo ha funcionado o no.</p>
+          <p><b>Cómo lo uso contigo:</b> aquí solo hay uno, y es sencillo: que hayáis llegado hasta esta línea.</p>
+        </div>
+      </details>
+      <details class="ref">
+        <summary><span class="ref-tag">€</span>Precio: una entrevista</summary>
+        <div class="ref-body">
+          <p><b>Qué es:</b> lo que cuesta lo que se ofrece.</p>
+          <p><b>Cómo lo uso contigo:</b> no pido un puesto, pido un rato para hablar. Si no encaja, os habrá costado poco.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
