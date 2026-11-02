@@ -335,7 +335,7 @@
 
   var meG = group('me', charLayer);
   ellipse([0, 0], 9, 3.6, 'room-shadow', meG, '');
-  var sprite = group('', meG);
+  var sprite = group('me-sprite', meG);
   var body = group('me-body', sprite);
   var legA = group('leg-a', body);
   rect(-5, -15, 4, 14, 'room-jeans', legA);
@@ -345,27 +345,28 @@
   rect(.5, -2.5, 5, 2.5, 'room-dark', legB, 1);
   rect(-7, -31, 14, 17, 'indigo', body, 2);
   rect(-6, -44, 12, 13, 'room-skin', body, 3);
-  var meFront = group('', body);
+  var meFront = group('me-front', body);
   rect(-6.5, -46, 13, 6, 'room-hair', meFront, 2.5);
   rect(-6.5, -44, 2.5, 6, 'room-hair', meFront, 1, '');
   rect(1, -38.5, 1.6, 2.2, 'room-dark', meFront, 0, '');
   rect(4, -38.5, 1.6, 2.2, 'room-dark', meFront, 0, '');
   rect(-9, -29, 3, 11, 'indigo', meFront, 1.5);
   rect(6, -29, 3, 11, 'indigo', meFront, 1.5).classList.add('arm-r');
-  circle([0, -28], 10, 'room-glow', meFront, 'lit-part');
-  rect(-2, -26.2, 4, 2.2, 'room-steel', meFront, .5);
-  circle([0, -29], 3.6, 'room-glass', meFront);
-  circle([0, -29], 3.6, 'light', meFront, 'o lit-part');
-  rect(-8, -24, 16, 10, 'room-box', meFront, 1);
-  rect(-8, -25.5, 16, 2.4, 'room-box-dark', meFront, 1);
+  var meBox = group('me-box', meFront);
+  circle([0, -28], 10, 'room-glow', meBox, 'lit-part');
+  rect(-2, -26.2, 4, 2.2, 'room-steel', meBox, .5);
+  circle([0, -29], 3.6, 'room-glass', meBox);
+  circle([0, -29], 3.6, 'light', meBox, 'o lit-part');
+  rect(-8, -24, 16, 10, 'room-box', meBox, 1);
+  rect(-8, -25.5, 16, 2.4, 'room-box-dark', meBox, 1);
   var point = group('point', meFront);
   make('path', { d: 'M7.5 -28L3 -33', fill: 'none', stroke: 'room-line', 'stroke-width': 4.6, 'stroke-linecap': 'round' }, point);
   make('path', { d: 'M7.5 -28L3 -33', fill: 'none', stroke: 'indigo', 'stroke-width': 3, 'stroke-linecap': 'round' }, point);
   circle([2, -34], 1.8, 'room-skin', point);
-  var meBack = group('', body);
+  var meBack = group('me-back', body);
   rect(-6.5, -46, 13, 12, 'room-hair', meBack, 3);
-  rect(-9.5, -24, 2.5, 8, 'room-box', meBack);
-  rect(7, -24, 2.5, 8, 'room-box', meBack);
+  rect(-9.5, -24, 2.5, 8, 'room-box', meBack, 0, 'o me-box');
+  rect(7, -24, 2.5, 8, 'room-box', meBack, 0, 'o me-box');
   rect(-9, -30, 3, 12, 'indigo', meBack, 1.5);
   rect(6, -30, 3, 12, 'indigo', meBack, 1.5);
   var rays = group('rays', meG);
@@ -571,17 +572,25 @@
     later(function () {
       meG.classList.remove('surprise');
       say(meHit.getAttribute('data-self'));
-      lightUp();
+      lightUp(true);
     }, 1400);
   }
 
-  function lightUp() {
+  function lightUp(auto) {
     lit = true;
     revealing = true;
     room.classList.add('lit');
     meG.classList.add('burst');
     later(function () { meG.classList.remove('burst', 'pointing'); }, 1100);
-    later(leave, reduced ? 0 : 2600);
+    if (auto) {
+      later(leave, reduced ? 0 : 2600);
+      return;
+    }
+    later(function () {
+      var inside = room.contains(document.activeElement);
+      continueBtn.hidden = false;
+      if (inside) continueBtn.focus({ preventScroll: true });
+    }, reduced ? 0 : 1200);
   }
 
   function autoSolve() {
@@ -595,46 +604,210 @@
     }, 1800);
     later(function () {
       hint.textContent = '';
-      lightUp();
+      lightUp(false);
     }, 3400);
   }
 
-  function finish() {
+  var main = document.getElementById('contenido');
+  var scene = document.getElementById('delivery');
+  var art = scene.querySelector('.delivery-art');
+  var deliveryStatus = document.getElementById('delivery-status');
+  var continueBtn = document.getElementById('room-continue');
+  var SW = 0, SH = 118, DX = 0, DY = 26;
+  var walker = document.createElement('div');
+  walker.className = 'walker room-art';
+  walker.hidden = true;
+  walker.setAttribute('aria-hidden', 'true');
+  var wsvg = make('svg', { viewBox: '-22 -62 44 70', focusable: 'false' });
+  walker.appendChild(wsvg);
+  main.appendChild(walker);
+  var wMe = null, wPos = [0, 0], walkRaf = 0, following = false, lastScroll = 0, handed = false;
+
+  function scale() { return room.clientWidth / VW; }
+  function dpt(i, j, h) { return [DX + (j - i) * TW, DY + (i + j) * TH - (h || 0) + 34]; }
+  function deliverSpot() { return [DX - 21.6, DY + 32.8]; }
+  function restSpot() { return [DX - 31.2, DY + 28]; }
+
+  function buildScene() {
+    var k = scale();
+    var aw = art.getBoundingClientRect().width;
+    if (!k || !aw) return;
+    SW = aw / k;
+    DX = SW / 2 - 21;
+    art.setAttribute('viewBox', '0 0 ' + SW.toFixed(1) + ' ' + SH);
+    while (art.firstChild) art.removeChild(art.firstChild);
+    poly([dpt(-.7, -1.7, 0), dpt(-.7, 3.3, 0), dpt(1.7, 3.3, 0), dpt(1.7, -1.7, 0)], 'indigo-soft', art, '');
+    quad(dpt(.8, 0, 0), dpt(.8, 2.6, 0), dpt(.8, 2.6, 30), dpt(.8, 0, 30), 'room-wood', art);
+    quad(dpt(0, 2.6, 0), dpt(.8, 2.6, 0), dpt(.8, 2.6, 30), dpt(0, 2.6, 30), 'room-wood-dark', art);
+    line(dpt(.8, .15, 15), dpt(.8, 2.45, 15), 'light', 2.2, art);
+    quad(dpt(.86, -.06, 30), dpt(.86, 2.66, 30), dpt(.86, 2.66, 34), dpt(.86, -.06, 34), 'room-white-side', art);
+    quad(dpt(-.06, 2.66, 30), dpt(.86, 2.66, 30), dpt(.86, 2.66, 34), dpt(-.06, 2.66, 34), 'room-white-dark', art);
+    quad(dpt(-.06, -.06, 34), dpt(-.06, 2.66, 34), dpt(.86, 2.66, 34), dpt(.86, -.06, 34), 'room-white', art);
+    var spot = dpt(.4, .45, 34);
+    var parcel = make('g', { class: 'parcel', transform: 'translate(' + spot[0].toFixed(1) + ' ' + (spot[1] + 14).toFixed(1) + ')' }, art);
+    parcel.appendChild(meBox.cloneNode(true));
+  }
+
+  function docPoint(local) {
+    var r = art.getBoundingClientRect(), m = main.getBoundingClientRect(), k = r.width / SW;
+    return [r.left - m.left + local[0] * k, r.top - m.top + local[1] * k];
+  }
+
+  function placeWalker(x, y) {
+    var k = scale();
+    wPos = [x, y];
+    walker.style.transform = 'translate(' + (x - 22 * k).toFixed(1) + 'px,' + (y - 62 * k).toFixed(1) + 'px)';
+  }
+
+  function sizeWalker() {
+    var k = scale();
+    wsvg.style.width = (44 * k) + 'px';
+    wsvg.style.height = (70 * k) + 'px';
+  }
+
+  function wFace(dir) {
+    wMe.querySelector('.me-front').style.display = dir.charAt(0) === 'f' ? '' : 'none';
+    wMe.querySelector('.me-back').style.display = dir.charAt(0) === 'b' ? '' : 'none';
+    wMe.querySelector('.me-sprite').setAttribute('transform', dir.charAt(1) === 'l' ? 'scale(-1 1)' : '');
+  }
+
+  function spawnWalker(x, y) {
+    while (wsvg.firstChild) wsvg.removeChild(wsvg.firstChild);
+    wMe = meG.cloneNode(true);
+    wMe.removeAttribute('transform');
+    wMe.removeAttribute('style');
+    wMe.setAttribute('class', 'me');
+    wsvg.appendChild(wMe);
+    sizeWalker();
+    placeWalker(x, y);
+    wFace('fr');
+    walker.hidden = false;
+  }
+
+  function stopFollow() { following = false; }
+
+  function follow() {
+    if (!following) return;
+    if (Math.abs(window.scrollY - lastScroll) > 3) { following = false; return; }
+    var target = main.getBoundingClientRect().top + window.scrollY + wPos[1] - window.innerHeight * .55;
+    if (target > window.scrollY) window.scrollTo({ top: target, behavior: 'instant' });
+    lastScroll = window.scrollY;
+  }
+
+  ['wheel', 'touchstart'].forEach(function (ev) { window.addEventListener(ev, stopFollow, { passive: true }); });
+  window.addEventListener('keydown', function (e) {
+    if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].indexOf(e.key) !== -1) stopFollow();
+  });
+
+  function runSegments(list, done) {
+    var n = 0, from = wPos.slice(), start = performance.now();
+    wFace(list[0].dir);
+    walkRaf = requestAnimationFrame(function step(now) {
+      var s = list[n], t = Math.min(1, (now - start) / s.ms);
+      placeWalker(from[0] + (s.to[0] - from[0]) * t, from[1] + (s.to[1] - from[1]) * t);
+      follow();
+      if (t >= 1) {
+        n++;
+        if (n >= list.length) { walkRaf = 0; done(); return; }
+        from = s.to.slice();
+        start = now;
+        wFace(list[n].dir);
+      }
+      walkRaf = requestAnimationFrame(step);
+    });
+  }
+
+  function startDelivery() {
     meHit.hidden = true;
     say('');
+    meG.style.display = 'none';
+    buildScene();
+    if (reduced) {
+      var rest = docPoint(restSpot());
+      spawnWalker(rest[0], rest[1]);
+      wMe.querySelectorAll('.me-box').forEach(function (b) { b.style.display = 'none'; });
+      scene.classList.add('done');
+      delivered();
+      document.getElementById('cierre').scrollIntoView({ behavior: 'instant', block: 'start' });
+      return;
+    }
+    var k = scale(), rr = room.getBoundingClientRect(), m = main.getBoundingClientRect();
+    var lane = rr.left - m.left + 34 * k;
+    var startY = rr.bottom - m.top - 16 * k;
+    var drop = docPoint(deliverSpot());
+    var corner = [lane, drop[1] + Math.abs(drop[0] - lane) / 2];
+    spawnWalker(lane, startY);
+    wMe.classList.add('walking');
+    following = true;
+    lastScroll = window.scrollY;
+    runSegments([
+      { to: corner, ms: Math.max(1600, Math.min(2800, (corner[1] - startY) / .26)), dir: 'fr' },
+      { to: drop, ms: 900, dir: drop[0] >= lane ? 'br' : 'bl' }
+    ], putDown);
+  }
+
+  function putDown() {
+    wMe.classList.remove('walking');
+    wFace('fr');
+    wMe.classList.add('deliver');
+    later(function () {
+      wMe.querySelectorAll('.me-box').forEach(function (b) { b.style.display = 'none'; });
+      scene.classList.add('done');
+    }, 380);
+    later(function () {
+      wMe.classList.remove('deliver');
+      wMe.classList.add('walking');
+      runSegments([{ to: docPoint(restSpot()), ms: 450, dir: 'fr' }], function () {
+        wMe.classList.remove('walking');
+        delivered();
+      });
+    }, 850);
+  }
+
+  function delivered() {
+    following = false;
+    handed = true;
+    var before = art.getBoundingClientRect().top;
     ending.hidden = false;
     revealNote.hidden = false;
+    var shift = art.getBoundingClientRect().top - before;
+    if (shift && !reduced) window.scrollBy({ top: shift, behavior: 'instant' });
+    var rest = docPoint(restSpot());
+    placeWalker(rest[0], rest[1]);
     finaleTitle.hidden = false;
     if (!reduced) finaleTitle.classList.add('finale-in');
-    later(function () {
-      document.getElementById('cierre').scrollIntoView({ behavior: reduced ? 'instant' : 'smooth', block: 'start' });
-      var contact = document.getElementById('hablamos');
-      if (contact) contact.focus({ preventScroll: true });
-    }, 3200);
+    deliveryStatus.textContent = 'Paquete entregado en Foton.';
+    var contact = document.getElementById('hablamos');
+    if (contact) contact.focus({ preventScroll: true });
   }
 
   function leave() {
     if (leaving) return;
+    leaving = true;
+    continueBtn.hidden = true;
     guitar.classList.remove('on');
     laptop.classList.remove('on');
     go([0, 0], 'bl', function () {
       door.classList.add('open');
       if (reduced) {
-        meG.style.display = 'none';
-        finish();
+        startDelivery();
         return;
       }
       var start = performance.now();
       meG.classList.add('walking', 'gone');
       outRaf = requestAnimationFrame(function out(now) {
-        var t = Math.min(1, (now - start) / 700);
+        var t = Math.min(1, (now - start) / 600);
         draw(.05 * t, -.8 * t);
         if (t < 1) outRaf = requestAnimationFrame(out);
-        else { outRaf = 0; meG.classList.remove('walking'); finish(); }
+        else { outRaf = 0; meG.classList.remove('walking'); startDelivery(); }
       });
     });
-    leaving = true;
   }
+
+  continueBtn.addEventListener('click', function () {
+    if (!lit || leaving) return;
+    leave();
+  });
 
   var boxes = [];
   room.querySelectorAll('.room-hit').forEach(function (b) {
@@ -684,7 +857,15 @@
     timers = [];
     if (raf) cancelAnimationFrame(raf);
     if (outRaf) cancelAnimationFrame(outRaf);
-    raf = outRaf = 0;
+    if (walkRaf) cancelAnimationFrame(walkRaf);
+    raf = outRaf = walkRaf = 0;
+    following = handed = false;
+    walker.hidden = true;
+    while (wsvg.firstChild) wsvg.removeChild(wsvg.firstChild);
+    wMe = null;
+    scene.classList.remove('done');
+    deliveryStatus.textContent = '';
+    continueBtn.hidden = true;
     seg = goal = pending = null;
     lastDir = '';
     lit = leaving = revealing = busy = false;
@@ -709,7 +890,17 @@
   }
 
   document.getElementById('room-restart').addEventListener('click', restart);
-  window.addEventListener('resize', function () { if (bubble.textContent) say(bubble.textContent); });
+  window.addEventListener('resize', function () {
+    if (bubble.textContent) say(bubble.textContent);
+    buildScene();
+    if (wMe && handed) {
+      sizeWalker();
+      var rest = docPoint(restSpot());
+      placeWalker(rest[0], rest[1]);
+    }
+  });
+
+  buildScene();
 
   face('fr');
   draw(pos[0], pos[1]);

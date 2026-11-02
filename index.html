@@ -101,11 +101,17 @@
       </blockquote>
     </div>
     <div class="room-actions">
+      <button class="btn btn-continue" id="room-continue" type="button" hidden>Continuar</button>
       <button class="btn btn-restart" id="room-restart" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/></svg>Volver a jugar</button>
     </div>
   </section>
 
   <section class="block finale" id="cierre">
+    <div class="delivery room-art" id="delivery" aria-hidden="true">
+      <p class="delivery-sign">FOTON</p>
+      <svg class="delivery-art" focusable="false"></svg>
+    </div>
+    <p class="sr-only" id="delivery-status" role="status"></p>
     <h2 class="finale-title" id="finale-title" hidden>Nos vemos en la entrevista. <span aria-hidden="true">💡</span></h2>
     <p class="finale-sign">— Manuel Felipe</p>
     <a class="btn btn-talk" id="hablamos" href="https://wa.me/34675573073?text=%C2%A1Est%C3%A1s%20contratado!%20Empiezas%20la%20semana%20que%20viene." target="_blank" rel="noopener">¿Hablamos?</a>
