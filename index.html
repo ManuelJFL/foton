@@ -94,7 +94,6 @@
       <p class="room-hint" id="room-hint" role="status" aria-live="polite"></p>
     </div>
     <div class="room-end" id="room-end" hidden>
-      <p class="room-reveal" id="room-reveal" role="status" hidden>Era yo. Esta factura no se mide en kWh, sino en ganas de empezar.</p>
       <blockquote class="room-quote">
         <p>La bombilla va en la caja.<br>La energía la pongo yo.</p>
         <footer class="room-sign"><s>Thomas Edison</s> — Manuel Felipe</footer>
@@ -112,16 +111,26 @@
       <svg class="delivery-art" focusable="false"></svg>
     </div>
     <p class="sr-only" id="delivery-status" role="status"></p>
-    <h2 class="finale-title" id="finale-title" hidden>Nos vemos en la entrevista. <span aria-hidden="true">💡</span></h2>
-    <p class="finale-sign">— Manuel Felipe</p>
-    <a class="btn btn-talk" id="hablamos" href="https://wa.me/34675573073?text=%C2%A1Est%C3%A1s%20contratado!%20Empiezas%20la%20semana%20que%20viene." target="_blank" rel="noopener">¿Hablamos?</a>
+    <h2 class="finale-title" id="finale-title" hidden>Aquí me tenéis. Yo soy la factura fuera de lo corriente… y quien os ha entregado este paquete.</h2>
+    <div class="gift" id="gift" hidden>
+      <p class="gift-lead">Dicen que no pulsarlo trae mil años sin luz.</p>
+      <button class="btn btn-gift" id="gift-btn" type="button" aria-expanded="false" aria-controls="gift-reveal">Por si acaso…</button>
+      <div class="gift-reveal" id="gift-reveal" hidden>
+        <p class="gift-big">Estás contratado.<br>Empiezas la semana que viene.</p>
+        <p class="gift-small">Vale… este regalo me lo he hecho yo.</p>
+        <a class="btn btn-call" href="tel:+34675573073">Ahora sí, llamar a Manuel</a>
+        <p class="gift-phone">+34 675 57 30 73</p>
+      </div>
+      <p class="sr-only" id="gift-status" role="status"></p>
+    </div>
+    <p class="finale-sign">— Manuel Felipe · <a class="finale-tel" id="hablamos" href="tel:+34675573073">675 57 30 73</a></p>
   </section>
 
   <section class="block" id="referencias">
     <p class="eyebrow">Glosario de la hoja</p>
     <h2 class="section-title">Referencias de marketing</h2>
     <div class="refs">
-      <details class="ref" open>
+      <details class="ref">
         <summary><span class="ref-tag">4P</span>Las 4 P</summary>
         <div class="ref-body">
           <p><b>Qué es:</b> producto, precio, plaza y promoción, las cuatro piezas básicas de cualquier oferta.</p>

@@ -534,7 +534,6 @@
   var revealing = false, busy = false, tries = 3, rejected = {};
   var hint = document.getElementById('room-hint');
   var triesEl = document.getElementById('room-tries');
-  var revealNote = document.getElementById('room-reveal');
   var finaleTitle = document.getElementById('finale-title');
 
   function pick(key) {
@@ -769,17 +768,53 @@
     handed = true;
     var before = art.getBoundingClientRect().top;
     ending.hidden = false;
-    revealNote.hidden = false;
     var shift = art.getBoundingClientRect().top - before;
     if (shift && !reduced) window.scrollBy({ top: shift, behavior: 'instant' });
     var rest = docPoint(restSpot());
     placeWalker(rest[0], rest[1]);
     finaleTitle.hidden = false;
     if (!reduced) finaleTitle.classList.add('finale-in');
-    deliveryStatus.textContent = 'Paquete entregado en Foton.';
-    var contact = document.getElementById('hablamos');
-    if (contact) contact.focus({ preventScroll: true });
+    gift.hidden = false;
+    armPulse();
+    deliveryStatus.textContent = finaleTitle.textContent;
+    giftBtn.focus({ preventScroll: true });
   }
+
+  var gift = document.getElementById('gift');
+  var giftBtn = document.getElementById('gift-btn');
+  var giftReveal = document.getElementById('gift-reveal');
+  var giftStatus = document.getElementById('gift-status');
+  var pulseWatch = null;
+
+  function armPulse() {
+    if (reduced || !('IntersectionObserver' in window)) return;
+    if (pulseWatch) pulseWatch.disconnect();
+    pulseWatch = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      pulseWatch.disconnect();
+      pulseWatch = null;
+      giftBtn.classList.add('pulse');
+    }, { threshold: 1 });
+    pulseWatch.observe(giftBtn);
+  }
+
+  function resetGift() {
+    if (pulseWatch) pulseWatch.disconnect();
+    pulseWatch = null;
+    gift.hidden = true;
+    giftBtn.classList.remove('pulse');
+    giftBtn.setAttribute('aria-expanded', 'false');
+    giftReveal.hidden = true;
+    giftStatus.textContent = '';
+  }
+
+  giftBtn.addEventListener('animationend', function () { giftBtn.classList.remove('pulse'); });
+  giftBtn.addEventListener('click', function () {
+    var open = giftBtn.getAttribute('aria-expanded') !== 'true';
+    giftBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    giftReveal.hidden = !open;
+    giftStatus.textContent = open ? giftReveal.querySelector('.gift-big').innerText.replace(/\s+/g, ' ') + ' ' + giftReveal.querySelector('.gift-small').textContent : '';
+  });
 
   function leave() {
     if (leaving) return;
@@ -875,7 +910,7 @@
     meG.classList.remove('walking', 'inspect', 'surprise', 'burst', 'gone', 'pointing');
     rejected = {};
     setTries(3);
-    revealNote.hidden = true;
+    resetGift();
     finaleTitle.hidden = true;
     finaleTitle.classList.remove('finale-in');
     hint.textContent = '';
