@@ -782,8 +782,6 @@
 
   var gift = document.getElementById('gift');
   var giftBtn = document.getElementById('gift-btn');
-  var giftReveal = document.getElementById('gift-reveal');
-  var giftStatus = document.getElementById('gift-status');
   var pulseWatch = null;
 
   function armPulse() {
@@ -803,18 +801,9 @@
     pulseWatch = null;
     gift.hidden = true;
     giftBtn.classList.remove('pulse');
-    giftBtn.setAttribute('aria-expanded', 'false');
-    giftReveal.hidden = true;
-    giftStatus.textContent = '';
   }
 
   giftBtn.addEventListener('animationend', function () { giftBtn.classList.remove('pulse'); });
-  giftBtn.addEventListener('click', function () {
-    var open = giftBtn.getAttribute('aria-expanded') !== 'true';
-    giftBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    giftReveal.hidden = !open;
-    giftStatus.textContent = open ? giftReveal.querySelector('.gift-big').innerText.replace(/\s+/g, ' ') + ' ' + giftReveal.querySelector('.gift-small').textContent : '';
-  });
 
   function leave() {
     if (leaving) return;
