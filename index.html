@@ -46,6 +46,13 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15M5 12l7 7 7-7"/></svg>
     </a>
   </div>
+  <button class="sfx" id="sfx" type="button" aria-pressed="true" aria-label="Efectos de sonido" title="Efectos de sonido">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M4 9v6h4l5 4V5L8 9z"/>
+      <path class="sfx-on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/>
+      <path class="sfx-off" d="M16.5 9.5l5 5M21.5 9.5l-5 5"/>
+    </svg>
+  </button>
 </header>
 
 <main id="contenido">
@@ -66,6 +73,7 @@
     </figure>
     <div class="video-bridge">
       <p>Antes de revisar esta factura, hay que encontrar al responsable.</p>
+      <p class="bridge-next" id="bridge-next" role="status" hidden>La historia sigue una habitación más abajo</p>
       <a class="btn btn-search" href="#juego">Buscar en la habitación ↓</a>
     </div>
   </section>
@@ -92,6 +100,7 @@
       <button class="room-hit room-me" type="button" data-obj="yo" aria-label="Manuel, con una caja y una bombilla" data-text="¿Yo?" data-hint="Se acabaron los intentos. El responsable era…" data-self="¡Soy yo!"></button>
       <p class="room-bubble" id="room-bubble" role="status" aria-live="polite"></p>
       <p class="room-hint" id="room-hint" role="status" aria-live="polite"></p>
+      <p class="room-label" id="room-label" aria-hidden="true" hidden></p>
     </div>
     <div class="room-end" id="room-end" hidden>
       <blockquote class="room-quote">
@@ -100,7 +109,7 @@
       </blockquote>
     </div>
     <div class="room-actions">
-      <button class="btn btn-continue" id="room-continue" type="button" hidden>Continuar</button>
+      <button class="btn btn-continue" id="room-continue" type="button" hidden>Continuar la historia</button>
       <button class="btn btn-restart" id="room-restart" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/></svg>Volver a jugar</button>
     </div>
   </section>
@@ -114,7 +123,7 @@
     <h2 class="finale-title" id="finale-title" hidden>Aquí me tenéis. Yo soy la factura fuera de lo corriente… y quien os ha entregado este paquete.</h2>
     <div class="gift" id="gift" hidden>
       <p class="gift-lead">Dicen que no pulsarlo trae mil años sin luz.</p>
-      <a class="btn btn-gift" id="gift-btn" href="https://wa.me/34675573073?text=%C2%A1Est%C3%A1s%20contratado!%20Empiezas%20la%20semana%20que%20viene." target="_blank" rel="noopener">Por si acaso…</a>
+      <a class="btn btn-gift" id="gift-btn" href="https://wa.me/34675573073?text=%C2%A1Est%C3%A1s%20contratado!%20Empiezas%20la%20semana%20que%20viene." target="_blank" rel="noopener">La última parte de la historia</a>
     </div>
     <p class="finale-sign">— Manuel Felipe · <a class="finale-tel" id="hablamos" href="tel:+34675573073">675 57 30 73</a></p>
   </section>
