@@ -1080,7 +1080,11 @@
     giftBtn.classList.remove('pulse');
   }
 
-  giftBtn.addEventListener('click', function () { giftBtn.classList.remove('pulse'); });
+  var refs = document.getElementById('referencias');
+  giftBtn.addEventListener('click', function () {
+    giftBtn.classList.remove('pulse');
+    if (refs) refs.hidden = false;
+  });
 
   function leave() {
     if (leaving) return;
