@@ -353,6 +353,50 @@ main { position: relative; padding: 0 16px 48px; }
 .cable-seg.on .cable-dot { fill: var(--light); }
 .video-frame.missing video { visibility: hidden; }
 .video-frame.missing .video-empty { display: flex; }
+.video-start {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  border: 0;
+  padding: 16px;
+  background: rgba(11, 13, 36, .55);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  font-family: inherit;
+  cursor: pointer;
+}
+.video-start-icon {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--light);
+  color: var(--indigo-deep);
+  box-shadow: 0 0 0 6px rgba(245, 197, 24, .25), 0 0 30px rgba(245, 197, 24, .45);
+  transition: transform .15s ease;
+}
+.video-start-icon svg { width: 34px; height: 34px; }
+.vs-play { display: none; }
+.video-frame.armed .vs-play { display: inline; }
+.video-frame.armed .vs-full { display: none; }
+.video-frame.armed .video-start-icon svg { margin-left: 4px; }
+.video-frame.armed .video-start { background: rgba(0, 0, 0, .35); }
+.video-start:hover .video-start-icon { transform: scale(1.06); }
+.video-start:active .video-start-icon { transform: scale(.96); }
+.video-start:focus-visible { outline: 3px solid var(--light); outline-offset: -3px; }
+.video-start-text { max-width: 16ch; text-align: center; text-shadow: 0 1px 4px rgba(0,0,0,.6); }
+.video-frame.started .video-start, .video-frame.missing .video-start { display: none; }
+.video-frame:fullscreen { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; box-shadow: none; background: #000; }
+.video-frame:-webkit-full-screen { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; box-shadow: none; background: #000; }
 #videos, #juego > .eyebrow, #juego > .section-title { text-align: center; }
 .video figcaption { padding: 14px 4px 0; }
 .video-num { font: 700 .72rem var(--mono); text-transform: uppercase; letter-spacing: .12em; color: var(--indigo); }

@@ -153,6 +153,56 @@
     v.addEventListener('error', missing);
     v.addEventListener('loadeddata', function () { frame.classList.remove('missing'); });
     if (v.error) missing();
+    var start = frame.querySelector('.video-start');
+    function isFull() {
+      return !!(document.fullscreenElement || document.webkitFullscreenElement || v.webkitDisplayingFullscreen);
+    }
+    function legacyFull() {
+      if (isFull() || !v.webkitEnterFullscreen) return;
+      try { v.webkitEnterFullscreen(); } catch (e) {
+        v.addEventListener('loadedmetadata', function () {
+          try { v.webkitEnterFullscreen(); } catch (err) {}
+        }, { once: true });
+      }
+    }
+    function goFull() {
+      if (isFull()) return;
+      var req = frame.requestFullscreen || frame.webkitRequestFullscreen;
+      if (!req) { legacyFull(); return; }
+      try {
+        var p = req.call(frame);
+        if (p && p.catch) p.catch(legacyFull);
+      } catch (e) { legacyFull(); }
+    }
+    v.addEventListener('play', function () {
+      frame.classList.add('started');
+      v.controls = true;
+      goFull();
+    });
+    if (start) {
+      var label = start.querySelector('.video-start-text');
+      var armed = function (on) {
+        frame.classList.toggle('armed', on);
+        label.textContent = on ? 'Empezar el vídeo' : 'Ver en pantalla completa';
+        start.setAttribute('aria-label', on ? 'Empezar el vídeo' : 'Ver el vídeo en pantalla completa');
+      };
+      var fsChange = function () {
+        if (!isFull() && !frame.classList.contains('started')) armed(false);
+      };
+      document.addEventListener('fullscreenchange', fsChange);
+      document.addEventListener('webkitfullscreenchange', fsChange);
+      v.addEventListener('webkitendfullscreen', fsChange);
+      v.controls = false;
+      start.addEventListener('click', function () {
+        if (!frame.classList.contains('armed')) {
+          armed(true);
+          goFull();
+          return;
+        }
+        var p = v.play();
+        if (p && p.catch) p.catch(function () {});
+      });
+    }
   });
 })();
 
