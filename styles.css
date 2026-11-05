@@ -176,7 +176,7 @@ body.lit .cover-thanks { opacity: 1; transform: none; transition-delay: .5s; }
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
-.lamp:focus-visible { outline: 3px dashed #9a9cff; outline-offset: 10px; }
+.lamp:focus, .lamp:focus-visible { outline: none; }
 
 .lamp-glow {
   position: absolute;
