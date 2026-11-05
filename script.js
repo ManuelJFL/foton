@@ -928,10 +928,22 @@
     var corner = [lane, drop[1] + Math.abs(drop[0] - lane) / 2];
     var stopY = roomActions.getBoundingClientRect().bottom - m.top + 130 * Math.min(k, 1.2);
     if (stopY > corner[1] - 40) stopY = startY + (corner[1] - startY) * .35;
-    spawnWalker(lane, startY);
+    var first = [];
+    if (wMe && !walker.hidden) {
+      if (walkRaf) cancelAnimationFrame(walkRaf);
+      walkRaf = 0;
+      sizeWalker();
+      if (Math.abs(wPos[0] - lane) > 2) first.push({ to: [lane, wPos[1]], ms: walkMs(wPos[0] - lane), dir: wPos[0] > lane ? 'fl' : 'fr' });
+      startY = wPos[1];
+      if (stopY < startY + 40) stopY = startY + 40;
+    } else {
+      spawnWalker(lane, startY);
+    }
+    waiting = false;
+    first.push({ to: [lane, stopY], ms: Math.max(700, Math.min(1500, (stopY - startY) / .26)), dir: 'fr' });
     wMe.classList.add('walking');
     following = true;
-    runSegments([{ to: [lane, stopY], ms: Math.max(700, Math.min(1500, (stopY - startY) / .26)), dir: 'fr' }], function () {
+    runSegments(first, function () {
       wMe.classList.remove('walking');
       suitUp(function () {
         wMe.classList.add('walking');
@@ -1054,11 +1066,13 @@
         hop(docPoint(restSpot()), 480, 18 * k, function () {
           var lane = laneDoc() - mainOrigin()[0], end = buttonSpot(), p = wPos.slice();
           wMe.classList.add('walking');
+          following = true;
           runSegments([
             { to: [lane, p[1]], ms: walkMs(p[0] - lane), dir: 'fl' },
             { to: [lane, end[1]], ms: walkMs(end[1] - p[1]), dir: 'fr' },
             { to: end, ms: walkMs(end[0] - lane), dir: 'fr' }
           ], function () {
+            following = false;
             wMe.classList.remove('walking');
             wFace('fr');
             atButton = true;
@@ -1121,6 +1135,40 @@
     var inside = room.contains(document.activeElement) || document.activeElement === document.body;
     continueBtn.hidden = false;
     if (inside) continueBtn.focus({ preventScroll: true });
+    if (!reduced) walkToContinue();
+  }
+
+  var waiting = false;
+
+  function continueSpot() {
+    var r = continueBtn.getBoundingClientRect(), m = main.getBoundingClientRect(), k = scale();
+    var lane = laneDoc() - mainOrigin()[0];
+    return [Math.max(lane, r.left - m.left - 24 * k), r.bottom - m.top];
+  }
+
+  function walkToContinue() {
+    var k = scale(), m = main.getBoundingClientRect(), R = room.getBoundingClientRect();
+    var lane = laneDoc() - mainOrigin()[0], Rt = R.top - m.top, Rl = R.left - m.left;
+    var end = continueSpot(), list = [], start, y;
+    if (lane < Rl) {
+      y = Rt + R.height * .35;
+      start = [Rl + 30 * k, y];
+      list.push({ to: [lane, y], ms: walkMs(start[0] - lane), dir: 'fl' });
+    } else {
+      y = Rt + 66 * k;
+      start = [lane, y];
+    }
+    list.push({ to: [lane, end[1]], ms: walkMs(end[1] - y), dir: 'fr' });
+    if (end[0] - lane > 2) list.push({ to: end, ms: walkMs(end[0] - lane), dir: 'fr' });
+    spawnWalker(start[0], start[1]);
+    wMe.classList.add('walking');
+    following = true;
+    runSegments(list, function () {
+      following = false;
+      wMe.classList.remove('walking');
+      wFace('fr');
+      waiting = true;
+    });
   }
 
   continueBtn.addEventListener('click', function () {
@@ -1641,7 +1689,7 @@
     if (parked) { parked = false; }
     deliveryStatus.textContent = '';
     courierTag.hidden = true;
-    danced = atButton = false;
+    danced = atButton = waiting = false;
     continueBtn.hidden = true;
     isOut = false;
     if (stage === 'open') setStage('game');
@@ -1674,6 +1722,11 @@
     if (bubble.textContent) say(bubble.textContent);
     buildScene();
     queueLayout();
+    if (wMe && waiting) {
+      sizeWalker();
+      var cs = continueSpot();
+      placeWalker(cs[0], cs[1]);
+    }
     if (wMe && handed && (atButton || !danced)) {
       sizeWalker();
       var rest = atButton ? buttonSpot() : docPoint(restSpot());
