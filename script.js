@@ -154,16 +154,28 @@
     v.addEventListener('loadeddata', function () { frame.classList.remove('missing'); });
     if (v.error) missing();
     var start = frame.querySelector('.video-start');
-    function isFull() {
+    var expand = frame.querySelector('.video-expand');
+    function nativeFull() {
       return !!(document.fullscreenElement || document.webkitFullscreenElement || v.webkitDisplayingFullscreen);
     }
+    function isFull() { return nativeFull() || frame.classList.contains('pseudo-full'); }
+    function paintExpand() {
+      if (!expand) return;
+      var on = isFull();
+      expand.classList.toggle('on', on);
+      expand.setAttribute('aria-pressed', on ? 'true' : 'false');
+      expand.setAttribute('aria-label', on ? 'Reducir el vídeo' : 'Ampliar el vídeo');
+    }
+    function pseudoFull(on) {
+      frame.classList.toggle('pseudo-full', on);
+      document.documentElement.classList.toggle('video-open', on);
+      paintExpand();
+    }
     function legacyFull() {
-      if (isFull() || !v.webkitEnterFullscreen) return;
-      try { v.webkitEnterFullscreen(); } catch (e) {
-        v.addEventListener('loadedmetadata', function () {
-          try { v.webkitEnterFullscreen(); } catch (err) {}
-        }, { once: true });
-      }
+      if (isFull()) return;
+      if (!v.webkitEnterFullscreen) { pseudoFull(true); return; }
+      try { v.webkitEnterFullscreen(); } catch (e) { pseudoFull(true); }
+      setTimeout(function () { if (!isFull()) pseudoFull(true); }, 400);
     }
     function goFull() {
       if (isFull()) return;
@@ -171,9 +183,26 @@
       if (!req) { legacyFull(); return; }
       try {
         var p = req.call(frame);
-        if (p && p.catch) p.catch(legacyFull);
-      } catch (e) { legacyFull(); }
+        if (p && p.catch) p.catch(function () { pseudoFull(true); });
+        setTimeout(function () { if (!isFull()) pseudoFull(true); }, 700);
+      } catch (e) { pseudoFull(true); }
     }
+    function leaveFull() {
+      if (frame.classList.contains('pseudo-full')) { pseudoFull(false); return; }
+      var ex = document.exitFullscreen || document.webkitExitFullscreen;
+      if (document.fullscreenElement || document.webkitFullscreenElement) { try { var q = ex.call(document); if (q && q.catch) q.catch(function () {}); } catch (e) {} }
+      else if (v.webkitExitFullscreen) { try { v.webkitExitFullscreen(); } catch (e) {} }
+    }
+    if (expand) expand.addEventListener('click', function () { if (isFull()) leaveFull(); else goFull(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && frame.classList.contains('pseudo-full')) pseudoFull(false); });
+    function nativeChange() {
+      if (nativeFull() && frame.classList.contains('pseudo-full')) pseudoFull(false);
+      paintExpand();
+    }
+    document.addEventListener('fullscreenchange', nativeChange);
+    document.addEventListener('webkitfullscreenchange', nativeChange);
+    v.addEventListener('webkitbeginfullscreen', paintExpand);
+    v.addEventListener('webkitendfullscreen', paintExpand);
     v.addEventListener('play', function () {
       frame.classList.add('started');
       v.controls = true;
