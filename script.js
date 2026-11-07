@@ -154,22 +154,13 @@
     v.addEventListener('loadeddata', function () { frame.classList.remove('missing'); });
     if (v.error) missing();
     var start = frame.querySelector('.video-start');
-    var expand = frame.querySelector('.video-expand');
     function nativeFull() {
       return !!(document.fullscreenElement || document.webkitFullscreenElement || v.webkitDisplayingFullscreen);
     }
     function isFull() { return nativeFull() || frame.classList.contains('pseudo-full'); }
-    function paintExpand() {
-      if (!expand) return;
-      var on = isFull();
-      expand.classList.toggle('on', on);
-      expand.setAttribute('aria-pressed', on ? 'true' : 'false');
-      expand.setAttribute('aria-label', on ? 'Reducir el vídeo' : 'Ampliar el vídeo');
-    }
     function pseudoFull(on) {
       frame.classList.toggle('pseudo-full', on);
       document.documentElement.classList.toggle('video-open', on);
-      paintExpand();
     }
     function legacyFull() {
       if (isFull()) return;
@@ -193,16 +184,28 @@
       if (document.fullscreenElement || document.webkitFullscreenElement) { try { var q = ex.call(document); if (q && q.catch) q.catch(function () {}); } catch (e) {} }
       else if (v.webkitExitFullscreen) { try { v.webkitExitFullscreen(); } catch (e) {} }
     }
-    if (expand) expand.addEventListener('click', function () { if (isFull()) leaveFull(); else goFull(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && frame.classList.contains('pseudo-full')) pseudoFull(false); });
+    var frameWasFull = false;
     function nativeChange() {
-      if (nativeFull() && frame.classList.contains('pseudo-full')) pseudoFull(false);
-      paintExpand();
+      var fe = document.fullscreenElement || document.webkitFullscreenElement;
+      if (fe === v && (frameWasFull || frame.classList.contains('pseudo-full'))) {
+        frameWasFull = false;
+        pseudoFull(false);
+        leaveFull();
+        return;
+      }
+      if (fe && frame.classList.contains('pseudo-full')) pseudoFull(false);
+      frameWasFull = fe === frame;
+    }
+    function nativeError(e) {
+      if (e.target !== v) return;
+      if (frame.classList.contains('pseudo-full')) pseudoFull(false);
+      else if (!isFull()) pseudoFull(true);
     }
     document.addEventListener('fullscreenchange', nativeChange);
     document.addEventListener('webkitfullscreenchange', nativeChange);
-    v.addEventListener('webkitbeginfullscreen', paintExpand);
-    v.addEventListener('webkitendfullscreen', paintExpand);
+    document.addEventListener('fullscreenerror', nativeError);
+    document.addEventListener('webkitfullscreenerror', nativeError);
     v.addEventListener('play', function () {
       frame.classList.add('started');
       v.controls = true;
