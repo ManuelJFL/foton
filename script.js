@@ -158,9 +158,35 @@
       return !!(document.fullscreenElement || document.webkitFullscreenElement || v.webkitDisplayingFullscreen);
     }
     function isFull() { return nativeFull() || frame.classList.contains('pseudo-full'); }
+    var bar = document.createElement('div');
+    bar.className = 'video-bar';
+    bar.innerHTML =
+      '<button type="button" class="vb-btn vb-play" aria-label="Reproducir o pausar"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path class="vb-i-play" d="M8 5v14l11-7z"/><path class="vb-i-pause" d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg></button>' +
+      '<span class="vb-time">0:00 / 0:00</span>' +
+      '<input class="vb-seek" type="range" min="0" max="1000" value="0" aria-label="Progreso del vídeo">' +
+      '<button type="button" class="vb-btn vb-mute" aria-label="Silenciar o activar el sonido"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path class="vb-i-on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="vb-i-off" d="M17 9l5 6M22 9l-5 6"/></svg></button>' +
+      '<button type="button" class="vb-btn vb-full" aria-label="Salir de la pantalla completa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>';
+    frame.appendChild(bar);
+    var vbTime = bar.querySelector('.vb-time'), vbSeek = bar.querySelector('.vb-seek');
+    function clock(t) { t = Math.max(0, Math.floor(t || 0)); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function paintBar() {
+      bar.classList.toggle('playing', !v.paused);
+      bar.classList.toggle('muted', v.muted || v.volume === 0);
+      vbTime.textContent = clock(v.currentTime) + ' / ' + clock(v.duration);
+      if (v.duration && document.activeElement !== vbSeek) vbSeek.value = Math.round(v.currentTime / v.duration * 1000);
+    }
+    ['play', 'pause', 'timeupdate', 'volumechange', 'loadedmetadata', 'durationchange'].forEach(function (n) { v.addEventListener(n, paintBar); });
+    bar.querySelector('.vb-play').addEventListener('click', function () {
+      if (v.paused) { var q = v.play(); if (q && q.catch) q.catch(function () {}); } else v.pause();
+    });
+    bar.querySelector('.vb-mute').addEventListener('click', function () { v.muted = !v.muted; });
+    vbSeek.addEventListener('input', function () { if (v.duration) v.currentTime = vbSeek.value / 1000 * v.duration; });
+    bar.querySelector('.vb-full').addEventListener('click', function () { leaveFull(); });
     function pseudoFull(on) {
       frame.classList.toggle('pseudo-full', on);
       document.documentElement.classList.toggle('video-open', on);
+      v.controls = on ? false : frame.classList.contains('started');
+      paintBar();
     }
     function legacyFull() {
       if (isFull()) return;
@@ -208,7 +234,7 @@
     document.addEventListener('webkitfullscreenerror', nativeError);
     v.addEventListener('play', function () {
       frame.classList.add('started');
-      v.controls = true;
+      v.controls = !frame.classList.contains('pseudo-full');
       goFull();
     });
     if (start) {
