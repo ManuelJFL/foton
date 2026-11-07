@@ -533,14 +533,6 @@
   rect(4, -38.5, 1.6, 2.2, 'room-dark', meFront, 0, '');
   rect(-9, -29, 3, 11, 'indigo', meFront, 1.5);
   rect(6, -29, 3, 11, 'indigo', meFront, 1.5).classList.add('arm-r');
-  var paper = group('me-paper', meFront);
-  var sheet = group('', paper);
-  sheet.setAttribute('transform', 'rotate(9 12 -24)');
-  rect(7.5, -31.5, 10, 13.5, 'room-white', sheet, .8).style.stroke = 'var(--room-dark)';
-  rect(7.5, -31.5, 10, 3.2, 'indigo', sheet, .8);
-  circle([10.4, -29.9], 1.1, 'light', sheet, '');
-  [-25.4, -23.2, -21, -18.9].forEach(function (y, n) { rect(9, y, n === 3 ? 4 : 7, 1, 'room-white-dark', sheet, .4); });
-  circle([8, -19.4], 2, 'room-skin', paper, '');
   var meBox = group('me-box', meFront);
   circle([0, -28], 10, 'room-glow', meBox, 'lit-part');
   rect(-2, -26.2, 4, 2.2, 'room-steel', meBox, .5);
@@ -1359,7 +1351,6 @@
     meHit.hidden = true;
     var p = parkSpot();
     spawnWalker(p[0], p[1]);
-    wMe.classList.add('with-cv');
     walker.classList.add('parked');
   }
 

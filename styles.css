@@ -628,8 +628,6 @@ html.video-open, html.video-open body { overflow: hidden; }
 .walker .lit-part { opacity: 1; }
 .walker .rays, .walker .me .point { display: none; }
 .me .courier-part, .me .puff { display: none; }
-.me .me-paper { display: none; }
-.walker .me.with-cv .me-paper { display: inline; }
 .walker .me.courier .courier-part { display: inline; }
 .walker .me.changing .puff { display: inline; transform-box: fill-box; transform-origin: center; animation: courier-puff .6s ease-out; }
 .walker .me.changing .me-body { animation: courier-spin .6s ease-in-out; }
