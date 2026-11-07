@@ -191,7 +191,8 @@
     function legacyFull() {
       if (isFull()) return;
       if (!v.webkitEnterFullscreen) { pseudoFull(true); return; }
-      try { v.webkitEnterFullscreen(); } catch (e) { pseudoFull(true); }
+      v.controls = true;
+      try { v.webkitEnterFullscreen(); } catch (e) { v.controls = frame.classList.contains('started'); pseudoFull(true); }
       setTimeout(function () { if (!isFull()) pseudoFull(true); }, 400);
     }
     function goFull() {
@@ -277,7 +278,7 @@
         start.setAttribute('aria-label', on ? 'Empezar el vídeo' : 'Ver el vídeo en pantalla completa');
       };
       var fsChange = function () {
-        if (!isFull() && !frame.classList.contains('started')) armed(false);
+        if (!isFull() && !frame.classList.contains('started')) { armed(false); v.controls = false; }
       };
       document.addEventListener('fullscreenchange', fsChange);
       document.addEventListener('webkitfullscreenchange', fsChange);
