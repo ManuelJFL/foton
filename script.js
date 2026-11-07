@@ -211,17 +211,48 @@
       else if (v.webkitExitFullscreen) { try { v.webkitExitFullscreen(); } catch (e) {} }
     }
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && frame.classList.contains('pseudo-full')) pseudoFull(false); });
-    var frameWasFull = false;
+    var frameWasFull = false, promoting = false, wantOut = false, lastFe = null;
+    function leaveNative() {
+      var ex = document.exitFullscreen || document.webkitExitFullscreen;
+      try { var q = ex.call(document); if (q && q.catch) q.catch(function () { wantOut = false; }); } catch (e) { wantOut = false; }
+    }
+    function promoteVideo() {
+      var fe = document.fullscreenElement || document.webkitFullscreenElement;
+      if (fe !== frame) return;
+      var req = v.requestFullscreen || v.webkitRequestFullscreen;
+      if (!req) return;
+      promoting = true;
+      try {
+        var q = req.call(v);
+        if (q && q.catch) q.catch(function () { promoting = false; });
+      } catch (e) { promoting = false; }
+      setTimeout(function () { promoting = false; }, 1500);
+    }
     function nativeChange() {
       var fe = document.fullscreenElement || document.webkitFullscreenElement;
-      if (fe === v && (frameWasFull || frame.classList.contains('pseudo-full'))) {
-        frameWasFull = false;
-        pseudoFull(false);
-        leaveFull();
+      if (wantOut) {
+        if (fe) leaveNative(); else wantOut = false;
+        frameWasFull = false; lastFe = fe;
+        return;
+      }
+      if (fe === v) {
+        if (promoting) { promoting = false; frameWasFull = false; lastFe = fe; return; }
+        if (frameWasFull || frame.classList.contains('pseudo-full')) {
+          pseudoFull(false);
+          wantOut = true;
+          leaveNative();
+          lastFe = fe;
+          return;
+        }
+      } else if (fe === frame && lastFe === v) {
+        wantOut = true;
+        leaveNative();
+        lastFe = fe;
         return;
       }
       if (fe && frame.classList.contains('pseudo-full')) pseudoFull(false);
       frameWasFull = fe === frame;
+      lastFe = fe;
     }
     function nativeError(e) {
       if (e.target !== v) return;
@@ -236,6 +267,7 @@
       frame.classList.add('started');
       v.controls = !frame.classList.contains('pseudo-full');
       goFull();
+      promoteVideo();
     });
     if (start) {
       var label = start.querySelector('.video-start-text');
