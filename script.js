@@ -190,10 +190,7 @@
     }
     function legacyFull() {
       if (isFull()) return;
-      if (!v.webkitEnterFullscreen) { pseudoFull(true); return; }
-      v.controls = true;
-      try { v.webkitEnterFullscreen(); } catch (e) { v.controls = frame.classList.contains('started'); pseudoFull(true); }
-      setTimeout(function () { if (!isFull() && !frame.classList.contains('started')) pseudoFull(true); }, 1500);
+      pseudoFull(true);
     }
     v.addEventListener('webkitendfullscreen', function () { if (frame.classList.contains('pseudo-full')) pseudoFull(false); });
     v.addEventListener('webkitbeginfullscreen', function () { if (frame.classList.contains('pseudo-full')) pseudoFull(false); });
