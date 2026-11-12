@@ -1155,6 +1155,11 @@
       spin(function () {
         hop(docPoint(restSpot()), 480, 18 * k, function () {
           var lane = laneDoc() - mainOrigin()[0], end = buttonSpot(), p = wPos.slice();
+          var pf = gift.querySelector('.proof');
+          if (pf) {
+            var pr = pf.getBoundingClientRect(), mm = main.getBoundingClientRect();
+            lane = Math.max(22 * k, pr.left - mm.left - 24 * k);
+          }
           wMe.classList.add('walking');
           following = true;
           runSegments([
@@ -1829,4 +1834,41 @@
   face('fr');
   draw(pos[0], pos[1]);
   depth(pos);
+})();
+
+(function () {
+  var imgs = document.querySelectorAll('.proof img');
+  if (!imgs.length) return;
+  var box = document.createElement('div');
+  box.className = 'lightbox';
+  box.hidden = true;
+  box.setAttribute('role', 'dialog');
+  box.setAttribute('aria-modal', 'true');
+  box.setAttribute('aria-label', 'Foto ampliada');
+  box.innerHTML = '<img alt=""><button type="button" class="lightbox-close" aria-label="Cerrar la foto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>';
+  document.body.appendChild(box);
+  var big = box.querySelector('img'), close = box.querySelector('button'), last = null;
+  function open(img) {
+    last = img;
+    big.src = img.currentSrc || img.src;
+    big.alt = img.alt;
+    box.hidden = false;
+    document.documentElement.classList.add('video-open');
+    close.focus({ preventScroll: true });
+  }
+  function shut() {
+    box.hidden = true;
+    document.documentElement.classList.remove('video-open');
+    if (last) last.focus({ preventScroll: true });
+  }
+  imgs.forEach(function (img) {
+    img.tabIndex = 0;
+    img.setAttribute('role', 'button');
+    img.addEventListener('click', function () { open(img); });
+    img.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(img); }
+    });
+  });
+  box.addEventListener('click', shut);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !box.hidden) shut(); });
 })();
