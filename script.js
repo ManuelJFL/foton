@@ -1875,3 +1875,23 @@
   box.addEventListener('click', shut);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !box.hidden) shut(); });
 })();
+
+(function () {
+  var TOPIC = 'foton-t3dgibwcmijcr5';
+  try {
+    var q = new URLSearchParams(location.search);
+    if (q.get('yo') === '1') localStorage.setItem('foton-yo', '1');
+    if (q.get('yo') === '0') localStorage.removeItem('foton-yo');
+    if (localStorage.getItem('foton-yo') === '1') return;
+    if (sessionStorage.getItem('foton-aviso')) return;
+    sessionStorage.setItem('foton-aviso', '1');
+  } catch (e) {}
+  var ua = navigator.userAgent;
+  var device = /iPhone|iPad/i.test(ua) ? 'iPhone' : /Android/i.test(ua) ? 'Android' : /Mac/i.test(ua) ? 'Mac' : /Windows/i.test(ua) ? 'Windows' : 'otro aparato';
+  var app = /FBAN|FBAV|Instagram|WhatsApp/i.test(ua) ? ' (desde una app)' : '';
+  var url = 'https://ntfy.sh/' + TOPIC + '?title=' + encodeURIComponent('Alguien ha entrado en la web de Fotón') + '&tags=bulb';
+  try {
+    fetch(url, { method: 'POST', mode: 'no-cors', keepalive: true, body: 'Desde ' + device + app + '.' }).catch(function () {});
+  } catch (e) {}
+})();
+
