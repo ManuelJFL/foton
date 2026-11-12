@@ -194,8 +194,11 @@
     }
     v.addEventListener('webkitendfullscreen', function () { if (frame.classList.contains('pseudo-full')) pseudoFull(false); });
     v.addEventListener('webkitbeginfullscreen', function () { if (frame.classList.contains('pseudo-full')) pseudoFull(false); });
+    var android = /Android/i.test(navigator.userAgent);
+    if (android && v.controlsList && v.controlsList.add) v.controlsList.add('nofullscreen');
     function goFull() {
       if (isFull()) return;
+      if (android) { pseudoFull(true); return; }
       var req = frame.requestFullscreen || frame.webkitRequestFullscreen;
       if (!req) { legacyFull(); return; }
       try {
