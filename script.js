@@ -1895,9 +1895,3 @@
   } catch (e) {}
 })();
 
-(function () {
-  try {
-    if (new URLSearchParams(location.search).get('grabar') === '1') document.documentElement.classList.add('rec');
-  } catch (e) {}
-})();
-
